@@ -51,6 +51,64 @@ describe('remises', () => {
   });
 });
 
+describe('plafond de remise', () => {
+  test('la remise est plafonnée à 30 % du sous-total', () => {
+    // Arrange
+    // palier 5 % + promo 40 % = 45 %, donc au-dessus du plafond
+    const items: CartItem[] = [{ price: 200, quantity: 1 }];
+    // Act
+    const r = computeTotal(items, { promoCode: 'DESTOCKAGE40' });
+    // Assert
+    expect(r.discount).toBeCloseTo(0.3 * 200, 2);
+  });
+
+  test('le plafond est répercuté sur la TVA et le total, pas seulement affiché', () => {
+    // Arrange
+    const items: CartItem[] = [{ price: 200, quantity: 1 }];
+    // Act
+    const r = computeTotal(items, { promoCode: 'DESTOCKAGE40' });
+    // Assert
+    expect(r).toEqual({
+      subtotal: 200,
+      discount: 60,
+      vat: 28,
+      shipping: 0,
+      total: 168,
+    });
+  });
+
+  test('le plafond joue aussi sans remise palier', () => {
+    // Arrange
+    // sous-total à 100 : pas de palier (seuil strict), promo 40 % seule
+    const items: CartItem[] = [{ price: 100, quantity: 1 }];
+    // Act
+    const r = computeTotal(items, { promoCode: 'DESTOCKAGE40' });
+    // Assert
+    expect(r.discount).toBe(30);
+    expect(r.total).toBe(84);
+  });
+
+  test("une remise sous le plafond n'est pas rognée", () => {
+    // Arrange
+    // palier 5 % + promo 10 % = 15 %, donc sous le plafond
+    const items: CartItem[] = [{ price: 200, quantity: 1 }];
+    // Act
+    const r = computeTotal(items, { promoCode: 'BIENVENUE10' });
+    // Assert
+    expect(r.discount).toBe(30);
+    expect(r.discount).toBeLessThan(0.3 * 200);
+  });
+
+  test('le plafond ne crée pas de remise quand il n’y en a aucune', () => {
+    // Arrange
+    const items: CartItem[] = [{ price: 20, quantity: 1 }];
+    // Act
+    const r = computeTotal(items);
+    // Assert
+    expect(r.discount).toBe(0);
+  });
+});
+
 describe('frais de port', () => {
   test('le port est offert à partir de 50 € exactement', () => {
     // Arrange
