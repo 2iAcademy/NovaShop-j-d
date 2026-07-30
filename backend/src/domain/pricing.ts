@@ -18,13 +18,12 @@ export interface ComputeTotalOptions {
 
 export const VAT_RATE = 0.2;
 
-const PROMOS: Record<string, number> = { BIENVENUE10: 0.1, DESTOCKAGE40: 0.4 };
+const PROMOS: Record<string, number> = { BIENVENUE10: 0.1 };
 
 const TIER_THRESHOLD = 100;
 const TIER_RATE = 0.05;
 const FREE_SHIPPING_THRESHOLD = 50;
 const SHIPPING_COST = 5;
-const MAX_DISCOUNT_RATE = 0.3;
 
 function assertItem(item: CartItem): void {
   if (
@@ -83,8 +82,7 @@ export function computeTotal(
   { promoCode, vatRate = VAT_RATE }: ComputeTotalOptions = {},
 ): PriceBreakdown {
   const sub = subtotal(items);
-  const rawDiscount = tierDiscount(sub) + promoDiscount(sub, promoCode);
-  const discount = round2(Math.min(rawDiscount, MAX_DISCOUNT_RATE * sub));
+  const discount = round2(tierDiscount(sub) + promoDiscount(sub, promoCode));
   const taxable = Math.max(0, sub - discount);
   const vat = round2(taxable * vatRate);
   const ship = shipping(sub);
