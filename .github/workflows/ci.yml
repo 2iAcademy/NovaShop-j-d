@@ -39,7 +39,7 @@ jobs:
         run: npm audit --json > audit-report.json
       - name: Publier le rapport (artefact)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sca-report
           path: backend/audit-report.json
