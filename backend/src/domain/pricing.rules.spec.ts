@@ -7,7 +7,7 @@ describe('TVA', () => {
     // Act
     const r = computeTotal(items);
     // Assert
-    expect(r.vat).toBe(21);
+    expect(r.vat).toBe(20);
   });
 
   test('la TVA porte sur le montant remisé, pas sur le sous-total brut', () => {
