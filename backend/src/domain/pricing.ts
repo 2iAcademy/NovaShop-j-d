@@ -25,6 +25,7 @@ const TIER_RATE = 0.05;
 const FREE_SHIPPING_THRESHOLD = 50;
 const SHIPPING_COST = 5;
 const MAX_DISCOUNT_RATE = 0.3;
+const MAX_VAT_RATE = 1;
 
 function assertItem(item: CartItem): void {
   if (
@@ -39,6 +40,17 @@ function assertItem(item: CartItem): void {
   }
   if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
     throw new Error('Quantité invalide');
+  }
+}
+
+function assertVatRate(rate: unknown): void {
+  if (
+    typeof rate !== 'number' ||
+    Number.isNaN(rate) ||
+    rate < 0 ||
+    rate > MAX_VAT_RATE
+  ) {
+    throw new Error('Taux de TVA invalide');
   }
 }
 
@@ -82,6 +94,8 @@ export function computeTotal(
   items: CartItem[],
   { promoCode, vatRate = VAT_RATE }: ComputeTotalOptions = {},
 ): PriceBreakdown {
+  assertVatRate(vatRate);
+
   const sub = subtotal(items);
   const rawDiscount = tierDiscount(sub) + promoDiscount(sub, promoCode);
   const discount = round2(Math.min(rawDiscount, MAX_DISCOUNT_RATE * sub));
