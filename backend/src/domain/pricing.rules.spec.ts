@@ -154,16 +154,27 @@ describe('panier vide et garde-fous', () => {
     });
   });
 
-  test('le total ne descend jamais en dessous de 0', () => {
+  test('le total reste positif dans le pire cas atteignable', () => {
     // Arrange
-    // Les remises plafonnent à 15 % (palier 5 % + promo 10 %) et ne peuvent donc
-    // jamais dépasser le sous-total : un taux de TVA négatif est la seule entrée
-    // publique qui rende le garde-fou Math.max(0, ...) atteignable.
-    const items: CartItem[] = [{ price: 100, quantity: 1 }];
+    // Remise au plafond (30 %) et TVA exonérée : le cas le plus défavorable
+    // que des entrées valides permettent de construire.
+    const items: CartItem[] = [{ price: 200, quantity: 1 }];
     // Act
-    const r = computeTotal(items, { vatRate: -5 });
+    const r = computeTotal(items, { promoCode: 'DESTOCKAGE40', vatRate: 0 });
     // Assert
-    expect(r.total).toBe(0);
+    expect(r.total).toBe(140);
+    expect(r.total).toBeGreaterThan(0);
+  });
+});
+
+describe('validation du taux de TVA', () => {
+  test('un taux de TVA négatif est refusé', () => {
+    // Arrange
+    const items: CartItem[] = [{ price: 100, quantity: 1 }];
+    // Act & Assert
+    expect(() => computeTotal(items, { vatRate: -5 })).toThrow(
+      'Taux de TVA invalide',
+    );
   });
 });
 
