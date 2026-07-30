@@ -1,0 +1,22 @@
+{
+  "name": "novashop",
+  "version": "0.0.1",
+  "private": true,
+  "description": "NovaShop monorepo",
+  "scripts": {
+    "lint": "cd backend && npm run lint",
+    "test": "cd backend && npm test",
+    "test:cov": "cd backend && npm run test:cov",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/**/*.{ts,js}": [
+      "eslint --fix --config backend/eslint.config.mjs",
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3"
+  }
+}
