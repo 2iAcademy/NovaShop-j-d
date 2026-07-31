@@ -11,12 +11,15 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,js}": [
-      "eslint --fix --config backend/eslint.config.mjs",
+      "./backend/node_modules/.bin/eslint --fix --config backend/eslint.config.mjs",
       "prettier --write"
     ]
   },
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3"
+  },
+  "dependencies": {
+    "prettier": "^3.9.6"
   }
 }

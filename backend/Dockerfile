@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 
 FROM base AS dev
+RUN apk add --no-cache curl
 RUN npm ci
 COPY . .
 EXPOSE 3000
@@ -14,6 +15,7 @@ COPY . .
 RUN npm run build
 
 FROM node:22-alpine AS runner
+RUN apk add --no-cache curl
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/dist ./dist
